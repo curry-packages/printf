@@ -1,0 +1,26 @@
+{
+    "name": "printf",
+    "version": "0.0.1",
+    "author": "Jasper Sikorra <jsi@informatik.uni-kiel.de>",
+    "maintainer": "Michael Hanus <mh@informatik.uni-kiel.de>",
+    "synopsis": "Operations to format values of basic data types with formatting flags",
+    "category": [ "Data" ],
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE",
+    "dependencies": {
+        "base": ">= 1.0.0, < 2.0.0"
+    },
+    "compilerCompatibility": {
+        "pakcs": ">= 2.0.0",
+        "kics2": ">= 2.0.0"
+    },
+    "exportedModules": [ "Data.Format" ],
+    "testsuite": {
+        "src-dir": "test",
+        "modules": [ "TestFormat_CPP" ]
+    },
+    "source": {
+      "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/printf.git",
+      "tag": "$version"
+    }
+}
