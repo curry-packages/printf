@@ -8,7 +8,7 @@
 ------------------------------------------------------------------------------
 {-# OPTIONS_CYMAKE -F --pgmF=currypp --optF=foreigncode #-}
 
-import Data.Format as Format -- required in the pre-processed program
+import Data.Format -- required in the pre-processed program
 
 -- Format a string and an integer:
 ex1 :: String -> Int -> IO ()
