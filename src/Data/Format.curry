@@ -10,9 +10,10 @@
 --- <http://pubs.opengroup.org/onlinepubs/009695399/functions/fprintf.html>
 ---
 --- @author Jasper Sikorra - jsi@informatik.uni-kiel.de
---- @version November 2017
---- @category general
+--- @version October 2020
 ------------------------------------------------------------------------------
+{-# OPTIONS_CYMAKE -Wno-incomplete-patterns #-}
+
 module Data.Format
   ( showChar, showInt, showFloat, showString )
  where
@@ -201,7 +202,7 @@ type MantissaSigned      = String
 type Exponent = Int
 
 floater :: Sign -> MantissaBeforePoint -> MantissaAfterPoint -> Exponent
-  -> Floater
+        -> Floater
 floater = Floater
 
 floaterCreator :: MantissaSigned -> Exponent -> Floater
@@ -283,13 +284,12 @@ onePrePoint (Floater s m1 m2 e) | m1 == "0" && m2 == ""       =
   onePrePoint (Floater s (init m1) ((last m1):m2) (e+1))
 
 roundFloater :: Int -> Floater -> Floater
-roundFloater n (Floater s m1 m2 e) =
-    if (length m2 <= n)
-      then Floater s m1 (m2 ++ replicate (n - length m2) '0') e
-      else
-        if (digitToInt (m2 !! n) < 5)
-          then Floater s m1 (take n m2) e
-          else roundUp (Floater s m1 (take n m2) e)
+roundFloater n (Floater sgn mb ma exp) =
+    if (length ma <= n)
+      then Floater sgn mb (ma ++ replicate (n - length ma) '0') exp
+      else if (digitToInt (ma !! n) < 5)
+             then Floater sgn mb (take n ma) exp
+             else roundUp (Floater sgn mb (take n ma) exp)
   where
     roundUp :: Floater -> Floater
     roundUp (Floater s m1 m2 e) = Floater s m1Result m2Result e
@@ -301,6 +301,7 @@ roundFloater n (Floater s m1 m2 e) =
         m1Result = if m1Overflow
                      then "1" ++ m1Rounded
                      else m1Rounded
+
     roundStringUp :: String -> (String, Bool)
     roundStringUp s = let (res, overflow) = roundBigEndianStrUp (reverse s) True
                       in (reverse res, overflow)
@@ -308,12 +309,11 @@ roundFloater n (Floater s m1 m2 e) =
     roundBigEndianStrUp :: String -> Bool -> (String, Bool)
     roundBigEndianStrUp ""     b     = ("", b)
     roundBigEndianStrUp (c:cs) False = (c:cs, False)
-    roundBigEndianStrUp (c:cs) True  = let n = digitToInt c
-                                       in if n == 9
-                                            then
-                                              let (rs, overflow) = roundBigEndianStrUp cs True
-                                              in  ('0':rs, overflow)
-                                            else (show (n+1) ++ cs, False)
+    roundBigEndianStrUp (c:cs) True  =
+      let nc = digitToInt c
+      in if nc == 9 then let (rs, overflow) = roundBigEndianStrUp cs True
+                         in  ('0':rs, overflow)
+                    else (show (nc+1) ++ cs, False)
 
 --- FLOATER DATA TYPE END ------------------------
 
