@@ -10,7 +10,7 @@
 --- <http://pubs.opengroup.org/onlinepubs/009695399/functions/fprintf.html>
 ---
 --- @author Jasper Sikorra - jsi@informatik.uni-kiel.de
---- @version October 2020
+--- @version December 2020
 ------------------------------------------------------------------------------
 {-# OPTIONS_CYMAKE -Wno-incomplete-patterns #-}
 
@@ -18,11 +18,9 @@ module Data.Format
   ( showChar, showInt, showFloat, showString )
  where
 
-import Char
-import Integer
-import Float
-import List
-import ReadNumeric
+import Data.Char
+import Data.List
+import Numeric
 
 -- Basic type for show functions
 type ShowSpec a = Typ -> Maybe Flag -> Maybe Width -> Maybe Precision
@@ -213,9 +211,12 @@ zeroFloater = Floater Positive "0" "" 0
 
 floatToFloater :: Float -> Floater
 floatToFloater f = let (mantissa,exp) = break ((==) 'e') (consistentShowFloat f)
-                   in if (exp == "") then floaterCreator mantissa 0
+                   in if exp == ""
+                        then floaterCreator mantissa 0
                         else floaterCreator mantissa
-                              (maybe failed fst (readInt (tail exp)))
+                              (case readInt (tail exp) of
+                                 [(n,_)] -> n
+                                 _       -> failed)
 
 getSign :: Floater -> Sign
 getSign (Floater s _ _ _) = s
@@ -438,5 +439,21 @@ convertToBase b n =
               14 -> "e"
               15 -> "f"
       in cTB (st ++ acc) b d
+
+--- Returns the bitwise NOT of the argument.
+--- Since integers have unlimited precision,
+--- only the 32 least significant bits are computed.
+---
+--- @param n - Argument.
+--- @return the bitwise negation of `n` truncated to 32 bits.
+
+bitNot :: Int -> Int
+bitNot n = aux 32 n
+ where
+  aux c m = if c==0
+              then 0
+              else let p = 2 * aux (c-1) (m `div` 2)
+                       q = 1 - m `mod` 2
+                   in p + q
 
 ------------------------------------------------------------------------------
