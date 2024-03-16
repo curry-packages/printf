@@ -16,7 +16,7 @@
         "modules": [ "TestFormat_CPP" ]
     },
     "source": {
-      "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/printf.git",
+      "git": "https://github.com/curry-packages/printf.git",
       "tag": "$version"
     }
 }
